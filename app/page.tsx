@@ -20,7 +20,7 @@ export default function HomePage() {
               </div>
 
               <p className="text-lg text-muted-foreground leading-relaxed text-pretty">
-                Olá! Sou Marcus Freire, corretor de imóveis atuando em Pouso Alegre - MG e região. Minha missão é ajudar
+                Olá! Eu sou Marcus Freire, corretor de imóveis atuando em Pouso Alegre - MG e região. Minha missão é ajudar
                 você a encontrar o imóvel dos seus sonhos ou realizar a melhor venda do seu patrimônio.
               </p>
 
@@ -83,7 +83,7 @@ export default function HomePage() {
                   <TrendingUp className="w-6 h-6 text-primary" />
                 </div>
                 <div className="text-3xl font-bold text-foreground">100+</div>
-                <div className="text-sm text-muted-foreground">Negócios Selados</div>
+                <div className="text-sm text-muted-foreground">Negócios Fechados</div>
               </Card>
             </div>
           </div>
