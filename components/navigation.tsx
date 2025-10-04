@@ -9,26 +9,27 @@ export function Navigation() {
   const pathname = usePathname()
 
   const links = [
-    { href: "/", label: "Home", icon: Home },
+    { href: "/", label: "Início", icon: Home }, // Mudei "Home" para "Início"
     { href: "/imoveis", label: "Imóveis", icon: Building2 },
     { href: "/contato", label: "Contato", icon: Mail },
   ]
 
   return (
-    <nav className="border-b border-border bg-card py-[23px]">
+    <nav className="border-b border-border bg-card">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20"> {/* Aumentei a altura do header */}
           <Link href="/" className="flex items-center">
             <Image
               src="/logo.png"
               alt="Marcus Freire - Corretor de Imóveis"
               width={120}
               height={40}
-              className="w-auto h-24"
+              className="w-auto h-12" // Ajustei a altura do logo
               priority
             />
           </Link>
 
+          {/* Alterações principais estão aqui 👇 */}
           <div className="flex gap-1">
             {links.map((link) => {
               const Icon = link.icon
@@ -38,14 +39,16 @@ export function Navigation() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+                  // AQUI ESTÁ A LÓGICA RESPONSIVA
+                  className={`flex flex-col items-center justify-center sm:flex-row sm:gap-2 p-2 sm:px-4 h-16 w-20 sm:w-auto rounded-md transition-colors text-center ${
                     isActive
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{link.label}</span>
+                  <Icon className="w-5 h-5 mb-1 sm:mb-0" />
+                  {/* Removemos o "hidden" para o texto aparecer sempre */}
+                  <span className="text-xs sm:text-sm">{link.label}</span>
                 </Link>
               )
             })}
