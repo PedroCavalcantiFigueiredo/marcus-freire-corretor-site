@@ -83,7 +83,7 @@ export default function HomePage() {
                   <TrendingUp className="w-6 h-6 text-primary" />
                 </div>
                 <div className="text-3xl font-bold text-foreground">100+</div>
-                <div className="text-sm text-muted-foreground">Negócios Fechados</div>
+                <div className="text-sm text-muted-foreground">Negócios Selados</div>
               </Card>
             </div>
           </div>
