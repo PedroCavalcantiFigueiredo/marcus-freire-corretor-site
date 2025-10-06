@@ -71,9 +71,13 @@ export default function ContatoPage() {
     e.preventDefault()
     setSending(true)
 
-    const mensagemFinal = imovelDetalhes
-      ? `Imóvel de Interesse: ${imovelDetalhes.titulo} - ${imovelDetalhes.localizacao} (ID: ${imovelId})\n\n---\n\n${formData.mensagem}`
-      : formData.mensagem
+    // AQUI ESTÁ A LÓGICA PRINCIPAL - MONTANDO A MENSAGEM FINAL
+    let mensagemFinal = formData.mensagem
+
+    if (imovelDetalhes && imovelId) {
+      const infoImovel = `Imóvel de Interesse:\n- ID: ${imovelId}\n- Nome: ${imovelDetalhes.titulo}\n- Localização: ${imovelDetalhes.localizacao}\n\n---\n\n`
+      mensagemFinal = infoImovel + formData.mensagem
+    }
 
     try {
       const { error } = await supabase.from("contatos").insert([
@@ -81,7 +85,7 @@ export default function ContatoPage() {
           nome: formData.nome,
           email: formData.email,
           telefone: formData.telefone,
-          mensagem: mensagemFinal,
+          mensagem: mensagemFinal, // Enviamos a mensagem formatada
         },
       ])
 
@@ -104,10 +108,10 @@ export default function ContatoPage() {
     })
   }
 
+  // O resto do JSX (parte visual) continua o mesmo
   return (
     <div className="min-h-screen">
       <Navigation />
-
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto">
           <div className="mb-12 space-y-4 text-center">
@@ -117,9 +121,7 @@ export default function ContatoPage() {
               mais breve possível.
             </p>
           </div>
-
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Informações de Contato */}
             <div className="space-y-6">
               <Card className="p-6 space-y-4">
                 <div className="flex items-start gap-4">
@@ -138,7 +140,6 @@ export default function ContatoPage() {
                   </div>
                 </div>
               </Card>
-
               <Card className="p-6 space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -156,7 +157,6 @@ export default function ContatoPage() {
                   </div>
                 </div>
               </Card>
-
               <Card className="p-6 space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -173,8 +173,6 @@ export default function ContatoPage() {
                 </div>
               </Card>
             </div>
-
-            {/* Formulário */}
             <Card className="lg:col-span-2 p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-6">
@@ -190,7 +188,6 @@ export default function ContatoPage() {
                       disabled={sending}
                     />
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="email">E-mail *</Label>
                     <Input
@@ -205,7 +202,6 @@ export default function ContatoPage() {
                     />
                   </div>
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone *</Label>
                   <Input
@@ -219,7 +215,6 @@ export default function ContatoPage() {
                     disabled={sending}
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="mensagem">Mensagem *</Label>
                   <Textarea
@@ -227,18 +222,20 @@ export default function ContatoPage() {
                     name="mensagem"
                     value={formData.mensagem}
                     onChange={handleChange}
-                    placeholder={loadingImovel ? "A carregar detalhes do imóvel..." : "Conte-me sobre o imóvel que você procura ou qualquer dúvida que tenha..."}
+                    placeholder={
+                      loadingImovel
+                        ? "A carregar detalhes do imóvel..."
+                        : "Conte-me sobre o imóvel que você procura ou qualquer dúvida que tenha..."
+                    }
                     rows={6}
                     required
                     disabled={sending || loadingImovel}
                   />
                 </div>
-
                 <Button type="submit" size="lg" className="w-full gap-2" disabled={sending || loadingImovel}>
                   <Send className="w-4 h-4" />
                   {sending ? "Enviando..." : "Enviar Mensagem"}
                 </Button>
-
                 <p className="text-xs text-muted-foreground text-center">
                   Ao enviar este formulário, você concorda em ser contatado por Marcus Freire sobre imóveis e serviços
                   relacionados.
