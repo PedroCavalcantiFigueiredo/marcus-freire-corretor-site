@@ -137,6 +137,22 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        <section className="container mx-auto px-4 pb-16">
+            <h2 className="text-2xl font-bold mb-6 text-center">Mapa de Pouso Alegre - MG</h2>
+            <div className="w-full h-[400px] rounded-lg overflow-hnpmidden shadow">
+              <iframe
+                title="Mapa Pouso Alegre"
+                src="https://www.google.com/maps?q=Pouso+Alegre,+MG&z=12&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </section>  
       </main>
     </div>
   )
