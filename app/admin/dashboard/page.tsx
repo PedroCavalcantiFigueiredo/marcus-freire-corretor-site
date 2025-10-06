@@ -260,6 +260,8 @@ export default function AdminDashboard() {
     setUploadedImages(imovel.imagens || (imovel.imagem ? [imovel.imagem] : []))
     setEditingId(imovel.id)
     setShowForm(true)
+
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleDelete = async (id: string) => {
