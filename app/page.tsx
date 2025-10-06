@@ -102,7 +102,7 @@ export default function HomePage() {
                 <div>
                   <div className="font-medium mb-1">Telefone</div>
                   <a
-                    href="tel:+5511999999999"
+                    href="tel:+5535998807707"
                     className="text-sm text-muted-foreground hover:text-accent transition-colors"
                   >
                     (35) 99880-7707
@@ -117,7 +117,7 @@ export default function HomePage() {
                 <div>
                   <div className="font-medium mb-1">E-mail</div>
                   <a
-                    href="mailto:marcus@exemplo.com"
+                    href="mailto:marcusmfreire@gmail.com"
                     className="text-sm text-muted-foreground hover:text-accent transition-colors break-all"
                   >
                     marcusmfreire@gmail.com
