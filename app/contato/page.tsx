@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Phone, Mail, MapPin, Send } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 
-// 1. Definimos um tipo para os detalhes do imóvel que vamos buscar
+// Definimos um tipo para os detalhes do imóvel que vamos buscar
 type ImovelDetalhes = {
   titulo: string
   localizacao: string
@@ -32,7 +32,6 @@ export default function ContatoPage() {
   const searchParams = useSearchParams()
   const imovelId = searchParams.get("imovel")
 
-  // 2. Usamos um único estado para guardar os detalhes do imóvel
   const [imovelDetalhes, setImovelDetalhes] = useState<ImovelDetalhes | null>(null)
   const [loadingImovel, setLoadingImovel] = useState(false)
 
@@ -41,7 +40,6 @@ export default function ContatoPage() {
       if (imovelId) {
         setLoadingImovel(true)
         
-        // 3. Buscamos o título E a localização
         const { data: imovel, error } = await supabase
           .from("imoveis")
           .select("titulo, localizacao") 
@@ -73,7 +71,6 @@ export default function ContatoPage() {
     e.preventDefault()
     setSending(true)
 
-    // 4. Montamos a mensagem final com o título E a localização
     const mensagemFinal = imovelDetalhes
       ? `Imóvel de Interesse: ${imovelDetalhes.titulo} - ${imovelDetalhes.localizacao} (ID: ${imovelId})\n\n---\n\n${formData.mensagem}`
       : formData.mensagem
@@ -92,7 +89,6 @@ export default function ContatoPage() {
 
       alert("Mensagem enviada com sucesso! Em breve entrarei em contato.")
       setFormData({ nome: "", email: "", telefone: "", mensagem: "" })
-      // Limpa os detalhes do imóvel também, se necessário, embora o redirect resolva
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error)
       alert("Erro ao enviar mensagem. Tente novamente.")
@@ -108,7 +104,6 @@ export default function ContatoPage() {
     })
   }
 
-  // O resto do JSX continua exatamente igual
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -124,15 +119,107 @@ export default function ContatoPage() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            <div className="space-y-6">{/* Cards de Informação */}</div>
+            {/* Informações de Contato */}
+            <div className="space-y-6">
+              <Card className="p-6 space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="font-medium">Telefone</div>
+                    <a
+                      href="tel:+5535988077707"
+                      className="text-sm text-muted-foreground hover:text-accent transition-colors block"
+                    >
+                      (35) 99880-7707
+                    </a>
+                    <p className="text-xs text-muted-foreground">Seg - Sex: 9h às 18h</p>
+                  </div>
+                </div>
+              </Card>
 
+              <Card className="p-6 space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="font-medium">E-mail</div>
+                    <a
+                      href="mailto:marcusmfreire@gmail.com"
+                      className="text-sm text-muted-foreground hover:text-accent transition-colors block break-all"
+                    >
+                      marcusmfreire@gmail.com
+                    </a>
+                    <p className="text-xs text-muted-foreground">Respondo em até 24h</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="font-medium">Localização</div>
+                    <p className="text-sm text-muted-foreground">
+                      Pouso Alegre - MG
+                      <br />
+                      Atendimento em toda região
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Formulário */}
             <Card className="lg:col-span-2 p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* O JSX do formulário não precisa de alterações */}
                 <div className="grid sm:grid-cols-2 gap-6">
-                  {/* ... campos nome e email ... */}
+                  <div className="space-y-2">
+                    <Label htmlFor="nome">Nome Completo *</Label>
+                    <Input
+                      id="nome"
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleChange}
+                      placeholder="Seu nome"
+                      required
+                      disabled={sending}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">E-mail *</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="seu@email.com"
+                      required
+                      disabled={sending}
+                    />
+                  </div>
                 </div>
-                {/* ... campo telefone ... */}
+
+                <div className="space-y-2">
+                  <Label htmlFor="telefone">Telefone *</Label>
+                  <Input
+                    id="telefone"
+                    name="telefone"
+                    type="tel"
+                    value={formData.telefone}
+                    onChange={handleChange}
+                    placeholder="(35) 99999-9999"
+                    required
+                    disabled={sending}
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="mensagem">Mensagem *</Label>
                   <Textarea
@@ -146,11 +233,16 @@ export default function ContatoPage() {
                     disabled={sending || loadingImovel}
                   />
                 </div>
+
                 <Button type="submit" size="lg" className="w-full gap-2" disabled={sending || loadingImovel}>
                   <Send className="w-4 h-4" />
                   {sending ? "Enviando..." : "Enviar Mensagem"}
                 </Button>
-                {/* ... resto do formulário ... */}
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Ao enviar este formulário, você concorda em ser contatado por Marcus Freire sobre imóveis e serviços
+                  relacionados.
+                </p>
               </form>
             </Card>
           </div>
