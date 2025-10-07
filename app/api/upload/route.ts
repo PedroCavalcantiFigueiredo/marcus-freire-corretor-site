@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     // --- INÍCIO DA LÓGICA DA MARCA D'ÁGUA ---
 
     // 1. Define o caminho para a sua logo de marca d'água
-    const watermarkPath = path.join(process.cwd(), "public", "logo-watermark.png")
+    const watermarkPath = path.join(process.cwd(), "public", "logo.png")
 
     // Medida de segurança: verifica se o arquivo da logo realmente existe
     if (!fs.existsSync(watermarkPath)) {
