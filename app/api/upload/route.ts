@@ -1,5 +1,8 @@
 import { put } from "@vercel/blob"
 import { NextResponse } from "next/server"
+import sharp from "sharp"
+import path from "path"
+import fs from "fs"
 
 export async function POST(request: Request) {
   try {
@@ -20,8 +23,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB" }, { status: 400 })
     }
 
-    // Fazer upload para Vercel Blob
-    const blob = await put(file.name, file, {
+    // --- INÍCIO DA LÓGICA DA MARCA D'ÁGUA ---
+
+    // 1. Define o caminho para a sua logo de marca d'água
+    const watermarkPath = path.join(process.cwd(), "public", "logo-watermark.png")
+
+    // Medida de segurança: verifica se o arquivo da logo realmente existe
+    if (!fs.existsSync(watermarkPath)) {
+      console.error("Arquivo da marca d'água não encontrado em:", watermarkPath)
+      return NextResponse.json({ error: "Erro interno: Marca d'água não encontrada." }, { status: 500 })
+    }
+
+    // 2. Converte o arquivo enviado para um buffer (formato que o Sharp consegue ler)
+    const imageBuffer = Buffer.from(await file.arrayBuffer())
+
+    // 3. Usa a biblioteca Sharp para aplicar a marca d'água
+    const watermarkedImageBuffer = await sharp(imageBuffer)
+      .composite([
+        {
+          input: watermarkPath,
+          gravity: "southeast", // Posição no canto inferior direito
+        },
+      ])
+      .toBuffer()
+
+    // --- FIM DA LÓGICA DA MARCA D'ÁGUA ---
+
+    // 4. Fazer upload do buffer da imagem COM marca d'água para o Vercel Blob
+    const blob = await put(file.name, watermarkedImageBuffer, {
       access: "public",
     })
 
