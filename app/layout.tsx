@@ -5,8 +5,8 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
-import { SocialButtons } from "@/components/social-buttons"
-import { Footer } from "@/components/footer" // <- Adicionado a importação
+import { Footer } from "@/components/footer"
+import { ConditionalSocialButtons } from "@/components/conditional-social-buttons" // <- Importamos o novo componente
 
 export const metadata: Metadata = {
   title: "Marcus Freire - Corretor de Imóveis",
@@ -53,8 +53,8 @@ export default function RootLayout({
         <main className="flex-grow">
           <Suspense fallback={null}>{children}</Suspense>
         </main>
-        <Footer /> {/* <- Componente do footer adicionado aqui */}
-        <SocialButtons />
+        <Footer />
+        <ConditionalSocialButtons /> {/* <- Usamos o novo componente aqui */}
         <Analytics />
       </body>
     </html>
