@@ -21,8 +21,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB" }, { status: 400 })
     }
 
-    // --- CORREÇÃO APLICADA AQUI ---
-    // Alterado de "logo-watermark.png" para "logo.png" para corresponder ao seu arquivo.
     const watermarkPath = path.join(process.cwd(), "public", "logo.png")
 
     if (!fs.existsSync(watermarkPath)) {
@@ -32,11 +30,36 @@ export async function POST(request: Request) {
 
     const imageBuffer = Buffer.from(await file.arrayBuffer())
 
+    // --- LÓGICA DE REDIMENSIONAMENTO AUTOMÁTICO DA LOGO ---
+
+    // 1. Pega as dimensões da imagem principal que o usuário enviou
+    const imageMetadata = await sharp(imageBuffer).metadata()
+    const imageWidth = imageMetadata.width
+
+    if (!imageWidth) {
+      throw new Error("Não foi possível ler as dimensões da imagem enviada.")
+    }
+
+    // 2. Calcula a largura máxima que a logo deve ter (ex: 35% da imagem principal)
+    const watermarkMaxWidth = Math.floor(imageWidth * 0.35)
+
+    // 3. Cria um buffer da logo, redimensionando-a para o tamanho calculado.
+    // O 'fit: "inside"' garante que a logo só será diminuída, nunca aumentada.
+    const watermarkBuffer = await sharp(watermarkPath)
+      .resize({
+        width: watermarkMaxWidth,
+        fit: "inside",
+      })
+      .toBuffer()
+
+    // --- FIM DA NOVA LÓGICA ---
+
+    // 4. Aplica a logo JÁ REDIMENSIONADA na imagem principal
     const watermarkedImageBuffer = await sharp(imageBuffer)
       .composite([
         {
-          input: watermarkPath,
-          gravity: "southeast",
+          input: watermarkBuffer, // Usamos o buffer da logo redimensionada
+          gravity: "northwest",
         },
       ])
       .toBuffer()
