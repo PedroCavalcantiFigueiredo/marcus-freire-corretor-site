@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 import { SocialButtons } from "@/components/social-buttons"
+import { Footer } from "@/components/footer" // <- Adicionado a importação
 
 export const metadata: Metadata = {
   title: "Marcus Freire - Corretor de Imóveis",
@@ -47,9 +48,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
+    <html lang="pt-BR" className="h-full">
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased flex flex-col min-h-screen`}>
+        <main className="flex-grow">
+          <Suspense fallback={null}>{children}</Suspense>
+        </main>
+        <Footer /> {/* <- Componente do footer adicionado aqui */}
         <SocialButtons />
         <Analytics />
       </body>
