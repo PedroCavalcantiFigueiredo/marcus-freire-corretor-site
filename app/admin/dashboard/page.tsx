@@ -425,7 +425,7 @@ export default function AdminDashboard() {
                         <Input
                           id="quartos"
                           type="number"
-                          min="1"
+                          min="0"
                           value={formData.quartos}
                           onChange={(e) => setFormData({ ...formData, quartos: Number.parseInt(e.target.value) })}
                           required
@@ -437,7 +437,7 @@ export default function AdminDashboard() {
                         <Input
                           id="banheiros"
                           type="number"
-                          min="1"
+                          min="0"
                           value={formData.banheiros}
                           onChange={(e) => setFormData({ ...formData, banheiros: Number.parseInt(e.target.value) })}
                           required
@@ -449,10 +449,11 @@ export default function AdminDashboard() {
                         <Input
                           id="area"
                           type="number"
-                          min="1"
+                          min="0"
                           value={formData.area}
-                          onChange={(e) => setFormData({ ...formData, area: Number.parseInt(e.target.value) })}
-                          required
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value, 10)
+                            setFormData({ ...formData, area: isNaN(value) ? 0 : value})}}
                         />
                       </div>
 
@@ -624,10 +625,12 @@ export default function AdminDashboard() {
                             <Bath className="w-4 h-4" />
                             <span>{imovel.banheiros}</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Square className="w-4 h-4" />
-                            <span>{imovel.area}m²</span>
-                          </div>
+                          {imovel.area > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Square className="w-4 h-4" />
+                              <span>{imovel.area}m²</span>
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
