@@ -47,7 +47,7 @@ export default function HomePage() {
             </div>
 
             {/* Substitua por este trecho */}
-            <div className="relative max-w- mx-auto"> {/* classes adicionadas aqui */}
+            <div className="relative max-w-sm mx-auto"> {/* classes adicionadas aqui */}
               <div className="aspect-[3/4] relative rounded-lg overflow-hidden bg-muted">
                 <img
                   src="/marcus-freire.png"
