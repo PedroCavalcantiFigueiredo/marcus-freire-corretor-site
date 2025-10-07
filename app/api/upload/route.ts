@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       .composite([
         {
           input: watermarkBuffer,
-          gravity: "northwest",
+          gravity: "south",
         },
       ])
       .toBuffer()
