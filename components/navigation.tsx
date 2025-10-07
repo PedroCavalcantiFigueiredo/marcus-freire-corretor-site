@@ -17,14 +17,14 @@ export function Navigation() {
   return (
     <nav className="border-b border-border bg-card">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20"> {/* Aumentei a altura do header */}
+        <div className="flex items-center justify-between h-24"> {/* Aumentei a altura do header */}
           <Link href="/" className="flex items-center">
             <Image
               src="/logo.png"
               alt="Marcus Freire - Corretor de Imóveis"
               width={120}
               height={40}
-              className="w-auto h-12" // Ajustei a altura do logo
+              className="w-auto h-25" // Ajustei a altura do logo
               priority
             />
           </Link>
