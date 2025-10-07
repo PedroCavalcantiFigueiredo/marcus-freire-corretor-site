@@ -21,6 +21,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB" }, { status: 400 })
     }
 
+    // --- CORREÇÃO APLICADA AQUI ---
+    // Alterado de "logo-watermark.png" para "logo.png" para corresponder ao seu arquivo.
     const watermarkPath = path.join(process.cwd(), "public", "logo.png")
 
     if (!fs.existsSync(watermarkPath)) {
@@ -30,31 +32,11 @@ export async function POST(request: Request) {
 
     const imageBuffer = Buffer.from(await file.arrayBuffer())
 
-    const imageMetadata = await sharp(imageBuffer).metadata()
-    const imageWidth = imageMetadata.width
-
-    if (!imageWidth) {
-      throw new Error("Não foi possível ler as dimensões da imagem enviada.")
-    }
-
-    // --- AJUSTE DE TAMANHO ---
-    // A logo agora terá 20% da largura da imagem. Antes era 35% (0.35).
-    const watermarkMaxWidth = Math.floor(imageWidth * 0.20)
-
-    const watermarkBuffer = await sharp(watermarkPath)
-      .resize({
-        width: watermarkMaxWidth,
-        fit: "inside",
-      })
-      .toBuffer()
-
     const watermarkedImageBuffer = await sharp(imageBuffer)
       .composite([
         {
-          input: watermarkBuffer,
-          // --- AJUSTE DE POSIÇÃO ---
-          // Alterado de "southeast" para "northwest" (canto superior esquerdo)
-          gravity: "northwest",
+          input: watermarkPath,
+          gravity: "southeast",
         },
       ])
       .toBuffer()
