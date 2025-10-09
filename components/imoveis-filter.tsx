@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react'
 
 const TIPOS_DE_IMOVEL = ["Apartamento", "Casa", "Cobertura", "Studio", "Loft"]
 
-// [CORREÇÃO] Definimos os valores padrão para evitar repetição
+// Definimos os valores padrão para evitar repetição e garantir consistência
 const defaultValues = {
   tipo: 'todos',
   garagem: 'indiferente',
@@ -67,7 +67,6 @@ export function ImoveisFilter() {
     updateURLParams(id, value)
   }
 
-  // [CORREÇÃO] Lógica ajustada para os selects
   const handleSelectChange = (key: keyof typeof defaultValues, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
     // Se o valor selecionado for o padrão, removemos o filtro da URL
@@ -98,7 +97,6 @@ export function ImoveisFilter() {
             <Input id="precoMax" type="number" placeholder="Máximo" value={filters.precoMax} onChange={handleInputChange} min="0"/>
           </div>
         </div>
-        {/* [CORREÇÃO] Values dos SelectItem alterados para strings não vazias */}
         <div>
           <Label>Tipo de Imóvel</Label>
           <Select value={filters.tipo} onValueChange={(v) => handleSelectChange('tipo', v)}>
