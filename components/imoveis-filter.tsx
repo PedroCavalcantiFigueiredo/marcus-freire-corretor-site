@@ -6,12 +6,11 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { X } from 'lucide-react'
+import { X, Search } from 'lucide-react' // [NOVO] Importar o ícone de busca
 import { useState, useEffect } from 'react'
 
 const TIPOS_DE_IMOVEL = ["Apartamento", "Casa", "Cobertura", "Studio", "Loft"]
 
-// Definimos os valores padrão para evitar repetição e garantir consistência
 const defaultValues = {
   tipo: 'todos',
   garagem: 'indiferente',
@@ -25,6 +24,7 @@ export function ImoveisFilter() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  // O estado local agora guarda as seleções antes de serem aplicadas
   const [filters, setFilters] = useState({
     termo: '',
     localizacao: '',
@@ -37,6 +37,7 @@ export function ImoveisFilter() {
     suites: defaultValues.suites,
   })
 
+  // Sincroniza o formulário com a URL quando a página carrega
   useEffect(() => {
     setFilters({
       termo: searchParams.get('termo') || '',
@@ -50,28 +51,32 @@ export function ImoveisFilter() {
       suites: searchParams.get('suites') || defaultValues.suites,
     })
   }, [searchParams])
-
-  const updateURLParams = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (value) {
-      params.set(key, value)
-    } else {
-      params.delete(key)
-    }
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }
   
+  // [ALTERADO] Os handlers agora APENAS atualizam o estado local
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     setFilters(prev => ({ ...prev, [id]: value }))
-    updateURLParams(id, value)
   }
 
   const handleSelectChange = (key: keyof typeof defaultValues, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
-    // Se o valor selecionado for o padrão, removemos o filtro da URL
-    const isDefault = value === defaultValues[key]
-    updateURLParams(key, isDefault ? '' : value)
+  }
+
+  // [NOVO] Função para aplicar os filtros e atualizar a URL
+  const handleApplyFilters = () => {
+    const params = new URLSearchParams()
+    // Adiciona apenas os filtros que têm valor e não são o padrão
+    if (filters.termo) params.set('termo', filters.termo);
+    if (filters.localizacao) params.set('localizacao', filters.localizacao);
+    if (filters.precoMin) params.set('precoMin', filters.precoMin);
+    if (filters.precoMax) params.set('precoMax', filters.precoMax);
+    if (filters.tipo !== defaultValues.tipo) params.set('tipo', filters.tipo);
+    if (filters.garagem !== defaultValues.garagem) params.set('garagem', filters.garagem);
+    if (filters.quartos !== defaultValues.quartos) params.set('quartos', filters.quartos);
+    if (filters.banheiros !== defaultValues.banheiros) params.set('banheiros', filters.banheiros);
+    if (filters.suites !== defaultValues.suites) params.set('suites', filters.suites);
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   const clearFilters = () => {
@@ -81,6 +86,7 @@ export function ImoveisFilter() {
   return (
     <Card className="p-4 md:p-6 mb-8 border-border/80">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-6">
+        {/* ... (todos os campos de Input e Select permanecem os mesmos, mas agora só atualizam o estado) ... */}
         <div className="md:col-span-2">
           <Label htmlFor="termo">Busca Geral</Label>
           <Input id="termo" placeholder="Título do imóvel..." value={filters.termo} onChange={handleInputChange}/>
@@ -154,11 +160,17 @@ export function ImoveisFilter() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-end">
-          <Button variant="ghost" className="w-full" onClick={clearFilters} disabled={!searchParams.size}>
-            <X className="w-4 h-4 mr-2" />
-            Limpar Filtros
-          </Button>
+
+        {/* [NOVO] Botões de Ação */}
+        <div className="flex flex-col sm:flex-row sm:items-end gap-2 md:col-span-3 lg:col-span-4">
+            <Button onClick={handleApplyFilters} className="w-full sm:w-auto">
+                <Search className="w-4 h-4 mr-2" />
+                Aplicar Filtros
+            </Button>
+            <Button variant="ghost" onClick={clearFilters} disabled={!searchParams.size} className="w-full sm:w-auto">
+                <X className="w-4 h-4 mr-2" />
+                Limpar Filtros
+            </Button>
         </div>
       </div>
     </Card>
