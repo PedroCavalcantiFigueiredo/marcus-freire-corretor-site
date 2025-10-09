@@ -155,7 +155,7 @@ export function ImoveisFilter() {
         <div className="flex items-end">
           <Button variant="ghost" className="w-full" onClick={clearFilters} disabled={!searchParams.size}>
             <X className="w-4 h-4 mr-2" />
-            Limpar Filtros
+            Limpar filtros
           </Button>
         </div>
       </div>
