@@ -27,6 +27,7 @@ import {
   Mail,
   Phone,
   Clock,
+  User, // Ícone novo
 } from "lucide-react"
 import Image from "next/image"
 import { ImageCarousel } from "@/components/image-carousel"
@@ -49,6 +50,7 @@ type Imovel = {
   garagem_coberta: boolean
   suites: number
   informacoes_adicionais?: string
+  contato_proprietario?: string // Novo campo
 }
 
 type Contato = {
@@ -136,6 +138,7 @@ export default function AdminDashboard() {
     garagem_coberta: false,
     suites: 0,
     informacoes_adicionais: "",
+    contato_proprietario: "", // Novo campo no estado
   })
 
   useEffect(() => {
@@ -319,6 +322,7 @@ export default function AdminDashboard() {
       garagem_coberta: imovel.garagem_coberta || false,
       suites: imovel.suites || 0,
       informacoes_adicionais: imovel.informacoes_adicionais || "",
+      contato_proprietario: imovel.contato_proprietario || "", // Novo campo
     })
     setUploadedImages(imovel.imagens || (imovel.imagem ? [imovel.imagem] : []))
     setEditingId(imovel.id)
@@ -354,6 +358,7 @@ export default function AdminDashboard() {
       garagem_coberta: false,
       suites: 0,
       informacoes_adicionais: "",
+      contato_proprietario: "", // Novo campo
     })
     setUploadedImages([])
     setEditingId(null)
@@ -434,6 +439,7 @@ export default function AdminDashboard() {
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
+                      {/* Campos existentes... */}
                       <div className="space-y-2">
                         <Label htmlFor="titulo">Título</Label>
                         <Input
@@ -520,9 +526,20 @@ export default function AdminDashboard() {
                         />
                       </div>
 
+                      <div className="space-y-2">
+                        <Label htmlFor="suites">Suítes</Label>
+                        <Input
+                          id="suites"
+                          type="number"
+                          min="0"
+                          value={formData.suites}
+                          onChange={(e) => setFormData({ ...formData, suites: Number.parseInt(e.target.value) })}
+                          required
+                        />
+                      </div>
+
                       <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="imagens">Imagens do Imóvel ({uploadedImages.length})</Label>
-
                         {uploadedImages.length > 0 && (
                           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                             <SortableContext items={uploadedImages} strategy={rectSortingStrategy}>
@@ -539,7 +556,6 @@ export default function AdminDashboard() {
                             </SortableContext>
                           </DndContext>
                         )}
-
                         <div className="flex gap-2">
                           <div className="flex-1">
                             <Input
@@ -557,7 +573,6 @@ export default function AdminDashboard() {
                             {uploading ? "Enviando..." : "Adicionar Imagens"}
                           </Button>
                         </div>
-
                         <p className="text-xs text-muted-foreground">
                           Arraste as imagens para reordenar. A primeira imagem será a capa.
                           <br />
@@ -565,20 +580,8 @@ export default function AdminDashboard() {
                         </p>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="suites">Suítes</Label>
-                        <Input
-                          id="suites"
-                          type="number"
-                          min="0"
-                          value={formData.suites}
-                          onChange={(e) => setFormData({ ...formData, suites: Number.parseInt(e.target.value) })}
-                          required
-                        />
-                      </div>
-
                       <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="informacoes_adicionais">Informações Adicionais (Opcional)</Label>
+                        <Label htmlFor="informacoes_adicionais">Informações Adicionais (Público)</Label>
                         <Textarea
                           id="informacoes_adicionais"
                           value={formData.informacoes_adicionais}
@@ -587,37 +590,50 @@ export default function AdminDashboard() {
                           rows={4}
                           className="resize-none"
                         />
+                      </div>
+
+                      {/* NOVO CAMPO DE CONTATO DO PROPRIETÁRIO */}
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="contato_proprietario">Contato do Proprietário (Privado)</Label>
+                        <Textarea
+                          id="contato_proprietario"
+                          value={formData.contato_proprietario}
+                          onChange={(e) => setFormData({ ...formData, contato_proprietario: e.target.value })}
+                          placeholder="Nome, telefone, e-mail, etc. Visível apenas para você."
+                          rows={3}
+                          className="resize-none"
+                        />
                         <p className="text-xs text-muted-foreground">
-                          Use este campo para adicionar informações extras sobre o imóvel que não se encaixam nos campos
-                          específicos.
+                          Esta informação não será exibida no site público.
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="garagem_coberta"
-                        checked={formData.garagem_coberta}
-                        onChange={(e) => setFormData({ ...formData, garagem_coberta: e.target.checked })}
-                        className="w-4 h-4"
-                      />
-                      <Label htmlFor="garagem_coberta" className="cursor-pointer">
-                        Possui garagem coberta
-                      </Label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="destaque"
-                        checked={formData.destaque}
-                        onChange={(e) => setFormData({ ...formData, destaque: e.target.checked })}
-                        className="w-4 h-4"
-                      />
-                      <Label htmlFor="destaque" className="cursor-pointer">
-                        Marcar como destaque
-                      </Label>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="garagem_coberta"
+                          checked={formData.garagem_coberta}
+                          onChange={(e) => setFormData({ ...formData, garagem_coberta: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="garagem_coberta" className="cursor-pointer">
+                          Possui garagem coberta
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="destaque"
+                          checked={formData.destaque}
+                          onChange={(e) => setFormData({ ...formData, destaque: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="destaque" className="cursor-pointer">
+                          Marcar como destaque
+                        </Label>
+                      </div>
                     </div>
 
                     <div className="flex gap-2">
@@ -637,7 +653,7 @@ export default function AdminDashboard() {
                   const images = imovel.imagens || (imovel.imagem ? [imovel.imagem] : [])
 
                   return (
-                    <Card key={imovel.id} className="overflow-hidden">
+                    <Card key={imovel.id} className="overflow-hidden flex flex-col">
                       <div className="relative aspect-[4/3] bg-muted">
                         {images.length > 0 ? (
                           <ImageCarousel images={images} alt={imovel.titulo} />
@@ -653,8 +669,8 @@ export default function AdminDashboard() {
                         )}
                       </div>
 
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
+                      <div className="p-4 space-y-3 flex flex-col flex-1">
+                        <div className="space-y-2 flex-1">
                           <div className="flex items-center justify-between">
                             <Badge variant="secondary">{imovel.tipo}</Badge>
                             <span className="font-bold text-accent">{imovel.preco}</span>
@@ -702,7 +718,20 @@ export default function AdminDashboard() {
                           )}
                         </div>
 
-                        <div className="flex gap-2 pt-2">
+                        {/* EXIBIÇÃO DO CONTATO DO PROPRIETÁRIO (APENAS DASHBOARD) */}
+                        {imovel.contato_proprietario && (
+                          <div className="mt-3 pt-3 border-t border-dashed border-yellow-500">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-yellow-600">
+                              <User className="w-4 h-4" />
+                              <span>Contato do Proprietário</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground whitespace-pre-wrap mt-1">
+                              {imovel.contato_proprietario}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 pt-4">
                           <Button
                             variant="outline"
                             size="sm"
