@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
@@ -31,6 +30,9 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import { ImageCarousel } from "@/components/image-carousel"
+import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core"
+import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 type Imovel = {
   id: string
@@ -57,6 +59,56 @@ type Contato = {
   mensagem: string
   lida: boolean
   created_at: string
+}
+
+type SortableImageProps = {
+  url: string
+  index: number
+  handleRemoveImage: (index: number) => void
+}
+
+const SortableImage = ({ url, index, handleRemoveImage }: SortableImageProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: url })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="relative aspect-video rounded-lg overflow-hidden bg-muted group touch-none"
+    >
+      <button
+        {...listeners}
+        className="absolute inset-0 w-full h-full z-10 cursor-grab active:cursor-grabbing"
+        aria-label={`Mover imagem ${index + 1}`}
+      >
+        <img
+          src={url || "/placeholder.svg"}
+          alt={`Imagem ${index + 1}`}
+          className="object-cover w-full h-full pointer-events-none"
+        />
+      </button>
+
+      <Button
+        type="button"
+        variant="destructive"
+        size="icon"
+        className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7"
+        onClick={() => handleRemoveImage(index)}
+        aria-label={`Remover imagem ${index + 1}`}
+      >
+        <X className="w-4 h-4" />
+      </Button>
+      <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded z-20 pointer-events-none">
+        {index + 1}
+      </div>
+    </div>
+  )
 }
 
 export default function AdminDashboard() {
@@ -205,6 +257,17 @@ export default function AdminDashboard() {
 
   const handleRemoveImage = (index: number) => {
     setUploadedImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      setUploadedImages((items) => {
+        const oldIndex = items.findIndex((url) => url === active.id)
+        const newIndex = items.findIndex((url) => url === over.id)
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -450,10 +513,10 @@ export default function AdminDashboard() {
                           id="area"
                           type="number"
                           min="0"
-                          value={formData.area}
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value, 10)
-                            setFormData({ ...formData, area: isNaN(value) ? 0 : value})}}
+                          value={formData.area || ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, area: parseInt(e.target.value, 10) || 0 })
+                          }
                         />
                       </div>
 
@@ -461,32 +524,20 @@ export default function AdminDashboard() {
                         <Label htmlFor="imagens">Imagens do Imóvel ({uploadedImages.length})</Label>
 
                         {uploadedImages.length > 0 && (
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {uploadedImages.map((url, index) => (
-                              <div
-                                key={index}
-                                className="relative aspect-video rounded-lg overflow-hidden bg-muted group"
-                              >
-                                <img
-                                  src={url || "/placeholder.svg"}
-                                  alt={`Imagem ${index + 1}`}
-                                  className="object-cover w-full h-full"
-                                />
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7"
-                                  onClick={() => handleRemoveImage(index)}
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
-                                  {index + 1}
-                                </div>
+                          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                            <SortableContext items={uploadedImages} strategy={rectSortingStrategy}>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {uploadedImages.map((url, index) => (
+                                  <SortableImage
+                                    key={url}
+                                    url={url}
+                                    index={index}
+                                    handleRemoveImage={handleRemoveImage}
+                                  />
+                                ))}
                               </div>
-                            ))}
-                          </div>
+                            </SortableContext>
+                          </DndContext>
                         )}
 
                         <div className="flex gap-2">
@@ -508,8 +559,9 @@ export default function AdminDashboard() {
                         </div>
 
                         <p className="text-xs text-muted-foreground">
-                          Formatos aceitos: JPG, PNG, WebP. Tamanho máximo: 5MB por imagem. Você pode selecionar
-                          múltiplas imagens de uma vez.
+                          Arraste as imagens para reordenar. A primeira imagem será a capa.
+                          <br />
+                          Formatos aceitos: JPG, PNG, WebP. Tamanho máximo: 5MB por imagem.
                         </p>
                       </div>
 
