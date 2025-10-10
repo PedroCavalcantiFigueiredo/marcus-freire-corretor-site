@@ -508,14 +508,15 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="area">Área(m²)</Label>
+                        <Label htmlFor="area">Área (m²)</Label>
                         <Input
                           id="area"
                           type="number"
                           min="0"
-                          value={formData.area}
-                          onChange={(e) => setFormData({ ...formData, area: Number.parseInt(e.target.value) })}
-                          required
+                          value={formData.area || ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, area: parseInt(e.target.value, 10) || 0 })
+                          }
                         />
                       </div>
 
