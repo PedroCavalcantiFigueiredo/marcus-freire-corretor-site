@@ -465,6 +465,19 @@ export default function AdminDashboard() {
                           <option>Studio</option>
                           <option>Sobrado</option>
                           <option>Loft</option>
+                          <option>Lote</option>
+                          <option>Chácara</option>
+                          <option>Fazenda</option>
+                          <option>Flat</option>
+                          <option>Duplex</option>
+                          <option>Triplex</option>
+                          <option>Terreno</option>
+                          <option>Galpão</option>
+                          <option>Prédio Comercial</option>
+                          <option>Salas Comerciais</option>
+                          <option>Conjunto Comercial</option>
+                          <option>Área rural</option>
+                          <option>Outro</option>
                         </select>
                       </div>
 
