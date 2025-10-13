@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { X, Search } from 'lucide-react' // [NOVO] Importar o ícone de busca
 import { useState, useEffect } from 'react'
 
-const TIPOS_DE_IMOVEL = ["Apartamento", "Casa", "Cobertura", "Studio", "Loft"]
+const TIPOS_DE_IMOVEL = ["Apartamento", "Casa", "Cobertura", "Studio", "Sobrado", "Loft", "Lote", "Chácara", "Fazenda", "Flat", "Duplex", "Triplex", "Terreno", "Galpão", "Prédio Comercial", "Sala Comercial", "Conjunto Comercial", "Área Rural", "Outros"]
 
 const defaultValues = {
   tipo: 'todos',
