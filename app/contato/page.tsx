@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Phone, Mail, MapPin, Send } from "lucide-react"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { getImovelDetalhes, sendContato } from "./actions"
 
 // Definimos um tipo para os detalhes do imóvel que vamos buscar
 type ImovelDetalhes = {
@@ -27,7 +27,6 @@ export default function ContatoPage() {
     mensagem: "",
   })
   const [sending, setSending] = useState(false)
-  const supabase = getSupabaseBrowserClient()
 
   const searchParams = useSearchParams()
   const imovelId = searchParams.get("imovel")
@@ -40,23 +39,19 @@ export default function ContatoPage() {
       if (imovelId) {
         setLoadingImovel(true)
         
-        const { data: imovel, error } = await supabase
-          .from("imoveis")
-          .select("titulo, localizacao") 
-          .eq("id", imovelId)
-          .single()
+        const { data: imovel, error } = await getImovelDetalhes(imovelId)
 
         if (error) {
           console.error("Erro ao buscar detalhes do imóvel:", error)
         } else if (imovel) {
-          setImovelDetalhes(imovel)
+          setImovelDetalhes(imovel as any)
         }
         setLoadingImovel(false)
       }
     }
 
     fetchImovelDetalhes()
-  }, [imovelId, supabase])
+  }, [imovelId])
 
   useEffect(() => {
     if (imovelDetalhes) {
@@ -80,16 +75,14 @@ export default function ContatoPage() {
     }
 
     try {
-      const { error } = await supabase.from("contatos").insert([
-        {
+      const { error } = await sendContato({
           nome: formData.nome,
           email: formData.email,
           telefone: formData.telefone,
-          mensagem: mensagemFinal, // Enviamos a mensagem formatada
-        },
-      ])
+          mensagem: mensagemFinal,
+      })
 
-      if (error) throw error
+      if (error) throw new Error(error)
 
       alert("Mensagem enviada com sucesso! Em breve entrarei em contato.")
       setFormData({ nome: "", email: "", telefone: "", mensagem: "" })

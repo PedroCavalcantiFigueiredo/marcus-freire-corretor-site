@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Bed, Bath, Square, MapPin, AlertCircle, Car, Home, Info, Building } from "lucide-react"
 import Link from "next/link"
-import { getSupabaseServerClient } from "@/lib/supabase/server"
+import { sql } from "@/lib/db"
 import { ImageCarousel } from "@/components/image-carousel"
 import { ImoveisFilter } from "@/components/imoveis-filter"
 
@@ -120,52 +120,72 @@ interface ImovelSearchParams {
 }
 
 async function getImoveis(params: ImovelSearchParams) {
-    const supabase = await getSupabaseServerClient()
-
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL === undefined) {
+    if (!process.env.DATABASE_URL) {
       console.log("[v0] Usando dados de exemplo - banco de dados não configurado")
-      // Lógica de fallback para dados de exemplo...
       return { data: IMOVEIS_EXEMPLO, isExample: true }
     }
 
-    let query = supabase
-        .from("imoveis")
-        .select("*")
-        .order("destaque", { ascending: false })
-        .order("created_at", { ascending: false })
+    try {
+        let query = "SELECT * FROM imoveis WHERE 1=1";
+        const queryParams: any[] = [];
 
-    if (params.termo) query = query.ilike('titulo', `%${params.termo}%`);
-    if (params.localizacao) query = query.ilike('localizacao', `%${params.localizacao}%`);
-    if (params.tipo) query = query.eq('tipo', params.tipo);
-    if (params.quartos) query = query.gte('quartos', Number(params.quartos));
-    if (params.banheiros) query = query.gte('banheiros', Number(params.banheiros));
-    if (params.suites) {
-        if (params.suites === "0") {
-            query = query.eq('suites', 0);
-        } else {
-            query = query.gte('suites', Number(params.suites));
+        if (params.termo) {
+            queryParams.push(`%${params.termo}%`);
+            query += ` AND titulo ILIKE $${queryParams.length}`;
         }
-    }
-    if (params.garagem === 'sim') query = query.eq('garagem_coberta', true);
+        if (params.localizacao) {
+            queryParams.push(`%${params.localizacao}%`);
+            query += ` AND localizacao ILIKE $${queryParams.length}`;
+        }
+        if (params.tipo) {
+            queryParams.push(params.tipo);
+            query += ` AND tipo = $${queryParams.length}`;
+        }
+        if (params.quartos) {
+            queryParams.push(Number(params.quartos));
+            query += ` AND quartos >= $${queryParams.length}`;
+        }
+        if (params.banheiros) {
+            queryParams.push(Number(params.banheiros));
+            query += ` AND banheiros >= $${queryParams.length}`;
+        }
+        if (params.suites) {
+            if (params.suites === "0") {
+                query += ` AND suites = 0`;
+            } else {
+                queryParams.push(Number(params.suites));
+                query += ` AND suites >= $${queryParams.length}`;
+            }
+        }
+        if (params.garagem === 'sim') {
+            query += ` AND garagem_coberta = true`;
+        }
 
-    const precoMinNum = Number(params.precoMin);
-    if (!isNaN(precoMinNum) && precoMinNum > 0) {
-        query = query.gte('preco_numerico', precoMinNum);
-    }
+        const precoMinNum = Number(params.precoMin);
+        if (!isNaN(precoMinNum) && precoMinNum > 0) {
+            queryParams.push(precoMinNum);
+            query += ` AND preco_numerico >= $${queryParams.length}`;
+        }
 
-    const precoMaxNum = Number(params.precoMax);
-    if (!isNaN(precoMaxNum) && precoMaxNum > 0) {
-        query = query.lte('preco_numerico', precoMaxNum);
-    }
+        const precoMaxNum = Number(params.precoMax);
+        if (!isNaN(precoMaxNum) && precoMaxNum > 0) {
+            queryParams.push(precoMaxNum);
+            query += ` AND preco_numerico <= $${queryParams.length}`;
+        }
 
-    const { data, error } = await query
+        query += " ORDER BY destaque DESC, created_at DESC";
 
-    if (error) {
+        // Neon client also supports tagged templates, which is safer.
+        // But for dynamic queries like this, we can use a helper or just construct it safely.
+        // Actually, sql helper from @neondatabase/serverless works best with tagged templates.
+        
+        const data = await sql.query(query, queryParams);
+
+        return { data: data.rows || [], isExample: false }
+    } catch (error) {
         console.error("Erro ao buscar imóveis:", error)
         return { data: [], isExample: false }
     }
-
-    return { data: data || [], isExample: false }
 }
 
 export default async function ImoveisPage({

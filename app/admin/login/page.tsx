@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -18,9 +18,8 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [isRegistering, setIsRegistering] = useState(false)
+  const [isRegistering, setIsRegistering] = useState(false) // Mantido apenas para evitar erros de CSS, no momento registro é manual
   const router = useRouter()
-  const supabase = getSupabaseBrowserClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,12 +27,13 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const result = await signIn("credentials", {
         email,
         password,
+        redirect: false,
       })
 
-      if (error) {
+      if (result?.error) {
         setError("Email ou senha incorretos")
         return
       }
@@ -49,31 +49,7 @@ export default function AdminLoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setLoading(true)
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/admin/dashboard`,
-        },
-      })
-
-      if (error) {
-        setError(error.message)
-        return
-      }
-
-      setError("")
-      alert("Conta criada com sucesso! Verifique seu email para confirmar o cadastro.")
-      setIsRegistering(false)
-    } catch (err) {
-      setError("Erro ao criar conta. Tente novamente.")
-    } finally {
-      setLoading(false)
-    }
+    setError("O registro de novos administradores está desabilitado por segurança. Entre em contato com o suporte.")
   }
 
   return (

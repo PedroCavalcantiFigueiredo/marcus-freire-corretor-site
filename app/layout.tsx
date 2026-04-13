@@ -6,7 +6,8 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 import { Footer } from "@/components/footer"
-import { ConditionalSocialButtons } from "@/components/conditional-social-buttons" // <- Importamos o novo componente
+import { ConditionalSocialButtons } from "@/components/conditional-social-buttons"
+import { SessionProvider } from "next-auth/react"
 
 export const metadata: Metadata = {
   title: "Marcus Freire - Corretor de Imóveis",
@@ -50,12 +51,14 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="h-full">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased flex flex-col min-h-screen`}>
-        <main className="flex-grow">
-          <Suspense fallback={null}>{children}</Suspense>
-        </main>
-        <Footer />
-        <ConditionalSocialButtons /> {/* <- Usamos o novo componente aqui */}
-        <Analytics />
+        <SessionProvider>
+          <main className="flex-grow">
+            <Suspense fallback={null}>{children}</Suspense>
+          </main>
+          <Footer />
+          <ConditionalSocialButtons />
+          <Analytics />
+        </SessionProvider>
       </body>
     </html>
   )

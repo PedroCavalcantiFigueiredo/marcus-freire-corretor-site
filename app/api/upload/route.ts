@@ -1,8 +1,5 @@
-import { put } from "@vercel/blob"
 import { NextResponse } from "next/server"
-import sharp from "sharp"
-import path from "path"
-import fs from "fs"
+import cloudinary from "@/lib/cloudinary"
 
 export async function POST(request: Request) {
   try {
@@ -17,52 +14,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Apenas imagens são permitidas" }, { status: 400 })
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB" }, { status: 400 })
+    if (file.size > 10 * 1024 * 1024) { // Cloudinary permite arquivos maiores, ajustei para 10MB
+      return NextResponse.json({ error: "Imagem muito grande. Máximo 10MB" }, { status: 400 })
     }
 
-    const watermarkPath = path.join(process.cwd(), "public", "logo.png")
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
-    if (!fs.existsSync(watermarkPath)) {
-      console.error("Arquivo da marca d'água não encontrado em:", watermarkPath)
-      return NextResponse.json({ error: "Erro interno: Marca d'água não encontrada." }, { status: 500 })
-    }
-
-    const imageBuffer = Buffer.from(await file.arrayBuffer())
-
-    const imageMetadata = await sharp(imageBuffer).metadata()
-    const imageWidth = imageMetadata.width
-
-    if (!imageWidth) {
-      throw new Error("Não foi possível ler as dimensões da imagem enviada.")
-    }
-
-    const watermarkMaxWidth = Math.floor(imageWidth * 0.20)
-
-    const watermarkBuffer = await sharp(watermarkPath)
-      .resize({
-        width: watermarkMaxWidth,
-        fit: "inside",
-      })
-      .toBuffer()
-
-    const watermarkedImageBuffer = await sharp(imageBuffer)
-      .composite([
+    // Upload para o Cloudinary
+    const uploadResponse = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
         {
-          input: watermarkBuffer,
-          gravity: "south",
+          folder: "imoveis",
+          // Adicionando transformação automática de marca d'água no upload (eager)
+          // ou simplesmente salvando o original e aplicando na URL depois.
+          // Aqui vamos salvar o original e retornar a URL com a transformação aplicada.
         },
-      ])
-      .toBuffer()
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      ).end(buffer)
+    }) as any
 
-    const blob = await put(file.name, watermarkedImageBuffer, {
-      access: "public",
-      // --- SOLUÇÃO ADICIONADA AQUI ---
-      // Garante que cada arquivo tenha um nome único, evitando o erro.
-      addRandomSuffix: true,
+    // Gerar URL com marca d'água usando transformações automáticas do Cloudinary
+    // l_system:site_logo -> sobrepõe a imagem 'system/site_logo'
+    // g_south -> posiciona no sul (baixo)
+    // w_0.2 -> escala a logo para 20% da largura da imagem original
+    // o_70 -> opacidade de 70%
+    const watermarkedUrl = cloudinary.url(uploadResponse.public_id, {
+      transformation: [
+        { width: 1200, crop: "limit" }, // Redimensionamento básico para otimização
+        { overlay: "system:site_logo", gravity: "south", width: "0.2", opacity: 70, y: 20 },
+        { fetch_format: "auto", quality: "auto" } // Otimização automática
+      ]
     })
 
-    return NextResponse.json({ url: blob.url })
+    return NextResponse.json({ url: watermarkedUrl, public_id: uploadResponse.public_id })
   } catch (error) {
     console.error("Erro no upload:", error)
     return NextResponse.json({ error: "Erro ao fazer upload da imagem" }, { status: 500 })

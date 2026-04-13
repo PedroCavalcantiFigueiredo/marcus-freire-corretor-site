@@ -3,7 +3,15 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { useSession, signOut } from "next-auth/react"
+import { 
+  getImoveis, 
+  getContatos, 
+  saveImovel, 
+  deleteImovel, 
+  markContatoAsRead, 
+  deleteContato 
+} from "./actions"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -119,12 +127,10 @@ export default function AdminDashboard() {
   const [contatos, setContatos] = useState<Contato[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [userEmail, setUserEmail] = useState("")
-  const [uploading, setUploading] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const router = useRouter()
-  const supabase = getSupabaseBrowserClient()
+  const { data: session } = useSession()
+  const userEmail = session?.user?.email || ""
 
   const [formData, setFormData] = useState({
     titulo: "",
@@ -142,25 +148,15 @@ export default function AdminDashboard() {
   })
 
   useEffect(() => {
-    checkUser()
     loadImoveis()
     loadContatos()
   }, [])
 
-  const checkUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (user) {
-      setUserEmail(user.email || "")
-    }
-  }
-
   const loadImoveis = async () => {
     try {
-      const { data, error } = await supabase.from("imoveis").select("*").order("created_at", { ascending: false })
+      const { data, error } = await getImoveis()
 
-      if (error) throw error
+      if (error) throw new Error(error)
       setImoveis(data || [])
     } catch (error) {
       console.error("Erro ao carregar imóveis:", error)
@@ -171,9 +167,9 @@ export default function AdminDashboard() {
 
   const loadContatos = async () => {
     try {
-      const { data, error } = await supabase.from("contatos").select("*").order("created_at", { ascending: false })
+      const { data, error } = await getContatos()
 
-      if (error) throw error
+      if (error) throw new Error(error)
       setContatos(data || [])
     } catch (error) {
       console.error("Erro ao carregar contatos:", error)
@@ -182,9 +178,9 @@ export default function AdminDashboard() {
 
   const marcarComoLida = async (id: string) => {
     try {
-      const { error } = await supabase.from("contatos").update({ lida: true }).eq("id", id)
+      const { error } = await markContatoAsRead(id)
 
-      if (error) throw error
+      if (error) throw new Error(error)
       loadContatos()
     } catch (error) {
       console.error("Erro ao marcar como lida:", error)
@@ -195,9 +191,9 @@ export default function AdminDashboard() {
     if (!confirm("Tem certeza que deseja excluir esta mensagem?")) return
 
     try {
-      const { error } = await supabase.from("contatos").delete().eq("id", id)
+      const { error } = await deleteContato(id)
 
-      if (error) throw error
+      if (error) throw new Error(error)
       loadContatos()
     } catch (error) {
       console.error("Erro ao excluir contato:", error)
@@ -205,9 +201,7 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push("/admin/login")
-    router.refresh()
+    await signOut({ callbackUrl: "/admin/login" })
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -288,18 +282,9 @@ export default function AdminDashboard() {
         imagem: uploadedImages[0],
       }
 
-      if (editingId) {
-        const { error } = await supabase
-          .from("imoveis")
-          .update({ ...imovelData, updated_at: new Date().toISOString() })
-          .eq("id", editingId)
+      const result = await saveImovel(imovelData, editingId || undefined)
 
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from("imoveis").insert([imovelData])
-
-        if (error) throw error
-      }
+      if (result.error) throw new Error(result.error)
 
       resetForm()
       loadImoveis()
@@ -335,9 +320,9 @@ export default function AdminDashboard() {
     if (!confirm("Tem certeza que deseja excluir este imóvel?")) return
 
     try {
-      const { error } = await supabase.from("imoveis").delete().eq("id", id)
+      const { error } = await deleteImovel(id)
 
-      if (error) throw error
+      if (error) throw new Error(error)
       loadImoveis()
     } catch (error) {
       console.error("Erro ao excluir imóvel:", error)
