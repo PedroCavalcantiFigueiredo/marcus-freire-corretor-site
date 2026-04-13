@@ -181,7 +181,7 @@ async function getImoveis(params: ImovelSearchParams) {
         
         const data = await sql.query(query, queryParams);
 
-        return { data: data.rows || [], isExample: false }
+        return { data: (data as any) || [], isExample: false }
     } catch (error) {
         console.error("Erro ao buscar imóveis:", error)
         return { data: [], isExample: false }

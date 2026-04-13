@@ -12,6 +12,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("Login attempt for:", credentials?.email)
         if (!credentials?.email || !credentials?.password) return null
 
         const users = await sql`
@@ -19,6 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         `;
 
         const user = users[0];
+        console.log("User found in DB:", !!user)
 
         if (!user) return null
 
@@ -26,6 +28,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           credentials.password as string,
           user.password
         )
+        console.log("Password correct:", isPasswordCorrect)
 
         if (!isPasswordCorrect) return null
 
