@@ -49,8 +49,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className="h-full">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased flex flex-col min-h-screen`}>
+    <html lang="pt-BR" className="h-full" suppressHydrationWarning>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased flex flex-col min-h-screen`} suppressHydrationWarning>
         <SessionProvider>
           <main className="flex-grow">
             <Suspense fallback={null}>{children}</Suspense>

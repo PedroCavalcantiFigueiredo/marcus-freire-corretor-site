@@ -2,9 +2,9 @@ const { neon } = require('@neondatabase/serverless');
 const bcrypt = require('bcryptjs');
 
 // 1. COLOQUE OS DADOS DO NOVO USUÁRIO AQUI:
-const NOVO_EMAIL = 'seu-email@exemplo.com';
-const NOVA_SENHA = 'sua-senha-aqui';
-const NOME = 'Administrador';
+const NOVO_EMAIL = 'marcusmfreire@gmail.com';
+const NOVA_SENHA = '011065';
+const NOME = 'Marcus Freire';
 
 async function criarUsuario() {
   if (!process.env.DATABASE_URL) {
@@ -13,7 +13,7 @@ async function criarUsuario() {
   }
 
   const sql = neon(process.env.DATABASE_URL);
-  
+
   console.log(`Gerando acesso para: ${NOVO_EMAIL}...`);
 
   try {

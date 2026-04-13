@@ -131,6 +131,8 @@ export default function AdminDashboard() {
   const router = useRouter()
   const { data: session } = useSession()
   const userEmail = session?.user?.email || ""
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const [formData, setFormData] = useState({
     titulo: "",
@@ -801,7 +803,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Clock className="w-4 h-4" />
-                          {new Date(contato.created_at).toLocaleString("pt-BR")}
+                          {typeof window !== 'undefined' && new Date(contato.created_at).toLocaleString("pt-BR")}
                         </div>
                       </div>
 
