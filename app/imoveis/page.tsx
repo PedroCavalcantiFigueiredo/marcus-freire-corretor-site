@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Navigation } from "@/components/navigation"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,120 +10,120 @@ import { ImageCarousel } from "@/components/image-carousel"
 import { ImoveisFilter } from "@/components/imoveis-filter"
 
 const IMOVEIS_EXEMPLO = [
-  {
-    id: "exemplo-1",
-    titulo: "Apartamento Moderno no Centro",
-    tipo: "Apartamento",
-    preco: "R$ 450.000",
-    localizacao: "Centro, Belo Horizonte",
-    quartos: 3,
-    banheiros: 2,
-    area: 95,
-    imagem: "/modern-apartment-living-room.png",
-    imagens: ["/modern-apartment-living-room.png"],
-    destaque: true,
-    garagem_coberta: true,
-    suites: 1,
-    informacoes_adicionais: "Este apartamento tem um design moderno e está localizado no coração da cidade.",
-  },
-  {
-    id: "exemplo-2",
-    titulo: "Casa de Luxo com Piscina",
-    tipo: "Casa",
-    preco: "R$ 1.200.000",
-    localizacao: "Savassi, Belo Horizonte",
-    quartos: 4,
-    banheiros: 3,
-    area: 280,
-    imagem: "/luxury-house-with-pool.png",
-    imagens: ["/luxury-house-with-pool.png"],
-    destaque: true,
-    garagem_coberta: true,
-    suites: 2,
-    informacoes_adicionais: "A casa vem com uma piscina privativa e um excelente acabamento.",
-  },
-  {
-    id: "exemplo-3",
-    titulo: "Cobertura Vista para o Mar",
-    tipo: "Cobertura",
-    preco: "R$ 2.500.000",
-    localizacao: "Pampulha, Belo Horizonte",
-    quartos: 5,
-    banheiros: 4,
-    area: 350,
-    imagem: "/penthouse-ocean-view.jpg",
-    imagens: ["/penthouse-ocean-view.jpg"],
-    destaque: false,
-    garagem_coberta: true,
-    suites: 3,
-    informacoes_adicionais: "A cobertura oferece uma vista panorâmica do mar e um espaço gourmet.",
-  },
-  {
-    id: "exemplo-4",
-    titulo: "Studio Compacto e Funcional",
-    tipo: "Studio",
-    preco: "R$ 280.000",
-    localizacao: "Funcionários, Belo Horizonte",
-    quartos: 1,
-    banheiros: 1,
-    area: 45,
-    imagem: "/modern-studio-apartment.png",
-    imagens: ["/modern-studio-apartment.png"],
-    destaque: false,
-    garagem_coberta: false,
-    suites: 0,
-    informacoes_adicionais: "Ideal para quem busca um espaço funcional e compacto no centro.",
-  },
-  {
-    id: "exemplo-5",
-    titulo: "Casa em Condomínio Fechado",
-    tipo: "Casa",
-    preco: "R$ 850.000",
-    localizacao: "Belvedere, Belo Horizonte",
-    quartos: 3,
-    banheiros: 3,
-    area: 220,
-    imagem: "/house-in-gated-community.jpg",
-    imagens: ["/house-in-gated-community.jpg"],
-    destaque: false,
-    garagem_coberta: true,
-    suites: 1,
-    informacoes_adicionais: "A casa está em um condomínio seguro e bem cuidado.",
-  },
-  {
-    id: "exemplo-6",
-    titulo: "Loft Industrial Reformado",
-    tipo: "Loft",
-    preco: "R$ 620.000",
-    localizacao: "Santa Efigênia, Belo Horizonte",
-    quartos: 2,
-    banheiros: 2,
-    area: 120,
-    imagem: "/industrial-loft-interior.jpg",
-    imagens: ["/industrial-loft-interior.jpg"],
-    destaque: false,
-    garagem_coberta: true,
-    suites: 0,
-    informacoes_adicionais: "Este loft combina estilo industrial com conforto e funcionalidade.",
-  },
+    {
+        id: "exemplo-1",
+        titulo: "Apartamento Moderno no Centro",
+        tipo: "Apartamento",
+        preco: "R$ 450.000",
+        localizacao: "Centro, Belo Horizonte",
+        quartos: 3,
+        banheiros: 2,
+        area: 95,
+        imagem: "/modern-apartment-living-room.png",
+        imagens: ["/modern-apartment-living-room.png"],
+        destaque: true,
+        garagem_coberta: true,
+        suites: 1,
+        informacoes_adicionais: "Este apartamento tem um design moderno e está localizado no coração da cidade.",
+    },
+    {
+        id: "exemplo-2",
+        titulo: "Casa de Luxo com Piscina",
+        tipo: "Casa",
+        preco: "R$ 1.200.000",
+        localizacao: "Savassi, Belo Horizonte",
+        quartos: 4,
+        banheiros: 3,
+        area: 280,
+        imagem: "/luxury-house-with-pool.png",
+        imagens: ["/luxury-house-with-pool.png"],
+        destaque: true,
+        garagem_coberta: true,
+        suites: 2,
+        informacoes_adicionais: "A casa vem com uma piscina privativa e um excelente acabamento.",
+    },
+    {
+        id: "exemplo-3",
+        titulo: "Cobertura Vista para o Mar",
+        tipo: "Cobertura",
+        preco: "R$ 2.500.000",
+        localizacao: "Pampulha, Belo Horizonte",
+        quartos: 5,
+        banheiros: 4,
+        area: 350,
+        imagem: "/penthouse-ocean-view.jpg",
+        imagens: ["/penthouse-ocean-view.jpg"],
+        destaque: false,
+        garagem_coberta: true,
+        suites: 3,
+        informacoes_adicionais: "A cobertura oferece uma vista panorâmica do mar e um espaço gourmet.",
+    },
+    {
+        id: "exemplo-4",
+        titulo: "Studio Compacto e Funcional",
+        tipo: "Studio",
+        preco: "R$ 280.000",
+        localizacao: "Funcionários, Belo Horizonte",
+        quartos: 1,
+        banheiros: 1,
+        area: 45,
+        imagem: "/modern-studio-apartment.png",
+        imagens: ["/modern-studio-apartment.png"],
+        destaque: false,
+        garagem_coberta: false,
+        suites: 0,
+        informacoes_adicionais: "Ideal para quem busca um espaço funcional e compacto no centro.",
+    },
+    {
+        id: "exemplo-5",
+        titulo: "Casa em Condomínio Fechado",
+        tipo: "Casa",
+        preco: "R$ 850.000",
+        localizacao: "Belvedere, Belo Horizonte",
+        quartos: 3,
+        banheiros: 3,
+        area: 220,
+        imagem: "/house-in-gated-community.jpg",
+        imagens: ["/house-in-gated-community.jpg"],
+        destaque: false,
+        garagem_coberta: true,
+        suites: 1,
+        informacoes_adicionais: "A casa está em um condomínio seguro e bem cuidado.",
+    },
+    {
+        id: "exemplo-6",
+        titulo: "Loft Industrial Reformado",
+        tipo: "Loft",
+        preco: "R$ 620.000",
+        localizacao: "Santa Efigênia, Belo Horizonte",
+        quartos: 2,
+        banheiros: 2,
+        area: 120,
+        imagem: "/industrial-loft-interior.jpg",
+        imagens: ["/industrial-loft-interior.jpg"],
+        destaque: false,
+        garagem_coberta: true,
+        suites: 0,
+        informacoes_adicionais: "Este loft combina estilo industrial com conforto e funcionalidade.",
+    },
 ]
 
 interface ImovelSearchParams {
-  termo?: string
-  localizacao?: string
-  tipo?: string
-  quartos?: string
-  banheiros?: string
-  suites?: string
-  garagem?: string
-  precoMin?: string
-  precoMax?:string
+    termo?: string
+    localizacao?: string
+    tipo?: string
+    quartos?: string
+    banheiros?: string
+    suites?: string
+    garagem?: string
+    precoMin?: string
+    precoMax?: string
 }
 
 async function getImoveis(params: ImovelSearchParams) {
     if (!process.env.DATABASE_URL) {
-      console.log("[v0] Usando dados de exemplo - banco de dados não configurado")
-      return { data: IMOVEIS_EXEMPLO, isExample: true }
+        console.log("[v0] Usando dados de exemplo - banco de dados não configurado")
+        return { data: IMOVEIS_EXEMPLO, isExample: true }
     }
 
     try {
@@ -178,7 +179,7 @@ async function getImoveis(params: ImovelSearchParams) {
         // Neon client also supports tagged templates, which is safer.
         // But for dynamic queries like this, we can use a helper or just construct it safely.
         // Actually, sql helper from @neondatabase/serverless works best with tagged templates.
-        
+
         const data = await sql.query(query, queryParams);
 
         return { data: (data as any) || [], isExample: false }
